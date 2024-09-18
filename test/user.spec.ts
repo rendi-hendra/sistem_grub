@@ -33,6 +33,7 @@ describe('UserController', () => {
         .post('/api/users')
         .send({
           username: '',
+          name: '',
           password: '',
         });
 
@@ -47,6 +48,7 @@ describe('UserController', () => {
         .post('/api/users')
         .send({
           username: 'test',
+          name: 'test',
           password: 'test',
         });
 
@@ -62,6 +64,7 @@ describe('UserController', () => {
         .post('/api/users')
         .send({
           username: 'test',
+          name: 'test',
           password: 'test',
         });
 
