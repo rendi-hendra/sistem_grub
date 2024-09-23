@@ -2,7 +2,7 @@
 
 ## Create Grub
 
-Endpoint : POST /api/grub
+Endpoint : POST /api/grubs
 
 Headers :
 
@@ -39,7 +39,7 @@ Response Body (Failed) :
 
 ## Join Grub
 
-Endpoint : POST /api/grub/join
+Endpoint : POST /api/grubs/join
 
 Headers :
 
@@ -77,7 +77,7 @@ Response Body (Failed) :
 
 ## Update Group
 
-Endpoint : PACTH /api/grub/:id
+Endpoint : PACTH /api/grubs/:id
 role : Admin
 
 Headers :
@@ -114,7 +114,7 @@ Response Body (Failed) :
 
 ## Get Grub Current
 
-Endpoint : GET /api/grub/current
+Endpoint : GET /api/grubs/current
 
 Headers :
 
@@ -147,7 +147,7 @@ Response Body (Failed) :
 
 ## Get User Grub
 
-Endpoint : GET /api/grub/:id/members
+Endpoint : GET /api/grubs/:grub_id/members
 
 Headers :
 
@@ -157,17 +157,24 @@ Response Body (Success) :
 
 ```json
 {
-  "data": [
-    {
-      "userId": 1,
-      "name": "rendi",
-      "role": "admin"
-    },
-    {
-      "userId": 2,
-      "name": "hendra"
-    }
-  ]
+  "data": {
+    "id": 1,
+    "grubId": "uud",
+    "name": "Mabar",
+    "total_user": 10,
+    "users": [
+      {
+        "userId": 1,
+        "name": "rendi",
+        "role": "admin"
+      },
+      {
+        "userId": 2,
+        "name": "hendra",
+        "role": "user"
+      }
+    ]
+  }
 }
 ```
 
@@ -181,7 +188,7 @@ Response Body (Failed) :
 
 ## Kick User Grub
 
-Endpoint : Delete /api/grub/:grub_id/members/:user_id
+Endpoint : Delete /api/grubs/:grub_id/members/:user_id
 role : "admin"
 
 Headers :
@@ -216,7 +223,7 @@ Response Body (Failed) :
 
 ## Logout Grub
 
-Endpoint : DELETE /api/grub
+Endpoint : DELETE /api/grubs
 
 Headers :
 

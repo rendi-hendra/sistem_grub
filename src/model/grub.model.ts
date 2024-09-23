@@ -3,6 +3,16 @@ export class GrubResponse {
   grub_id: string;
   name: string;
   total_users: number;
+  // user_id?: number;
+  // username?: string;
+  // role?: string;
+  users?: UserResponse[];
+}
+
+export class UserResponse {
+  id: number;
+  name: string;
+  role: string;
 }
 
 export class GrubMemberResponse {

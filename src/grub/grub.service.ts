@@ -46,17 +46,17 @@ export class GrubService {
         },
       });
 
-      const totalUser = await this.prismaService.grub.count({
-        where: {
-          id: grub.id,
-        },
-      });
+      // const totalUser = await this.prismaService.grub.count({
+      //   where: {
+      //     id: grub.id,
+      //   },
+      // });
 
       return {
         id: grub.id,
         grub_id: grub.grub_id,
         name: grub.name,
-        total_users: totalUser,
+        total_users: 1,
       };
     });
 
@@ -105,12 +105,92 @@ export class GrubService {
       },
     });
 
+    const totalUser = await this.prismaService.grubMember.count({
+      where: {
+        grub_id: joinRequest.grub_id,
+      },
+    });
+
+    await this.prismaService.grub.update({
+      where: {
+        grub_id: joinRequest.grub_id,
+      },
+      data: {
+        total_users: totalUser,
+      },
+    });
+
     return {
       id: member.id,
       user_id: member.user_id,
       grub_id: member.grub_id,
       name: grub.name,
-      total_users: 1,
+      total_users: totalUser,
     };
+  }
+
+  async getGrubMember(user: User, grubId: string): Promise<GrubResponse> {
+    // this.logger.debug(`Get grub ${JSON.stringify(request)}`);
+
+    const grub = await this.prismaService.grub.findFirst({
+      where: {
+        grub_id: grubId,
+      },
+    });
+
+    if (!grub) {
+      throw new HttpException('Grub not found', 404);
+    }
+
+    const isMember = await this.prismaService.grubMember.findFirst({
+      where: {
+        user_id: user.id,
+        grub_id: grubId,
+      },
+    });
+
+    if (!isMember) {
+      throw new HttpException('Forbidden', 403);
+    }
+
+    const result = await this.prismaService.grubMember.findMany({
+      where: {
+        // user_id: user.id,
+        grub_id: grubId,
+      },
+      include: {
+        grub: true,
+        user: true,
+        role: true,
+      },
+    });
+
+    const users = result.map((grubMember) => {
+      return {
+        id: grubMember.user_id,
+        name: grubMember.user.username,
+        role: grubMember.role.name,
+      };
+    });
+
+    return {
+      id: grub.id,
+      grub_id: grub.grub_id,
+      name: grub.name,
+      total_users: result.length,
+      users: users,
+    };
+
+    // return result.map((grubMember) => {
+    //   return {
+    //     id: grubMember.grub.id,
+    //     grub_id: grubMember.grub.grub_id,
+    //     name: grubMember.grub.name,
+    //     total_users: grubMember.grub.total_users,
+    //     user_id: grubMember.user_id,
+    //     username: grubMember.user.username,
+    //     role: grubMember.role.name,
+    //   };
+    // });
   }
 }

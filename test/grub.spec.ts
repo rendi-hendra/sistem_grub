@@ -28,10 +28,6 @@ describe('GrubController', () => {
     beforeEach(async () => {
       await testService.deleteAll();
       await testService.createUser();
-
-      // await testService.deleteGrubMember();
-      // await testService.deleteGrub();
-      // await testService.createGrub();
     });
     it('should be rejected if request is invalid', async () => {
       const response = await request(app.getHttpServer())

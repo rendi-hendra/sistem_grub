@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
+  Param,
   Post,
   // UseInterceptors,
 } from '@nestjs/common';
@@ -39,6 +41,19 @@ export class GrubController {
     @Body() request: JoinGrubRequest,
   ): Promise<WebResponse<GrubMemberResponse>> {
     const result = await this.grubService.join(user, request);
+    return {
+      data: result,
+    };
+  }
+
+  @Get('/:grub_id/member')
+  @HttpCode(200)
+  async getGrubMember(
+    @Auth() user: User,
+    @Param('grub_id') grubId: string,
+  ): Promise<WebResponse<GrubResponse>> {
+    const result = await this.grubService.getGrubMember(user, grubId);
+
     return {
       data: result,
     };
