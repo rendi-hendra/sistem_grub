@@ -26,9 +26,12 @@ describe('GrubController', () => {
 
   describe('POST /api/grubs', () => {
     beforeEach(async () => {
-      await testService.deleteGrubMember();
-      await testService.deleteGrub();
-      //   await testService.createGrub();
+      await testService.deleteAll();
+      await testService.createUser();
+
+      // await testService.deleteGrubMember();
+      // await testService.deleteGrub();
+      // await testService.createGrub();
     });
     it('should be rejected if request is invalid', async () => {
       const response = await request(app.getHttpServer())
@@ -57,21 +60,53 @@ describe('GrubController', () => {
       expect(response.status).toBe(201);
       expect(response.body.data.name).toBe('test');
     });
+  });
 
-    // it('should be rejected if username already exists', async () => {
-    //   await testService.createUser();
-    //   const response = await request(app.getHttpServer())
-    //     .post('/api/users')
-    //     .send({
-    //       username: 'test',
-    //       name: 'test',
-    //       password: 'test',
-    //     });
+  // Join
+  describe('POST /api/grubs/join', () => {
+    it('should be rejected if request is invalid', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/api/grubs/join')
+        .set('Authorization', 'test')
+        .send({
+          grub_id: '1',
+        });
 
-    //   logger.info(response.body);
+      logger.info(response.body);
 
-    //   expect(response.status).toBe(400);
-    //   expect(response.body.errors).toBeDefined();
-    // });
+      expect(response.status).toBe(404);
+      expect(response.body.errors).toBeDefined();
+    });
+
+    it('should be able to join grub', async () => {
+      const grubId = await testService.getGrubId();
+      const response = await request(app.getHttpServer())
+        .post('/api/grubs/join')
+        .set('Authorization', 'test2')
+        .send({
+          grub_id: grubId.grub_id,
+        });
+
+      logger.info(response.body);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.name).toBe('test');
+    });
+
+    it('should be rejected if user already joined', async () => {
+      // await testService.createGrubMember();
+      const grubId = await testService.getGrubId();
+      const response = await request(app.getHttpServer())
+        .post('/api/grubs/join')
+        .set('Authorization', 'test')
+        .send({
+          grub_id: grubId.id,
+        });
+
+      logger.info(response.body);
+
+      expect(response.status).toBe(400);
+      expect(response.body.errors).toBeDefined();
+    });
   });
 });

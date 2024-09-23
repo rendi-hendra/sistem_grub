@@ -25,7 +25,7 @@ describe('UserController', () => {
   });
 
   describe('POST /api/users', () => {
-    afterEach(async () => {
+    beforeEach(async () => {
       await testService.deleteAll();
     });
     it('should be rejected if request is invalid', async () => {

@@ -39,7 +39,7 @@ model Grub {
 
 model GrubMember {
   id        Int          @id @default(autoincrement())
-  grub_id   String       @unique
+  grub_id   String
   user_id   Int
   role_id   Int
 

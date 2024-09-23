@@ -28,7 +28,6 @@ CREATE TABLE `grub_members` (
     `user_id` INTEGER NOT NULL,
     `role_id` INTEGER NOT NULL,
 
-    UNIQUE INDEX `grub_members_grub_id_key`(`grub_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
