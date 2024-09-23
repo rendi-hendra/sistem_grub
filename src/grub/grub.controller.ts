@@ -58,4 +58,13 @@ export class GrubController {
       data: result,
     };
   }
+
+  @Get()
+  @HttpCode(200)
+  async getGrubs(@Auth() user: User): Promise<WebResponse<GrubResponse[]>> {
+    const result = await this.grubService.getGrubs(user);
+    return {
+      data: result,
+    };
+  }
 }

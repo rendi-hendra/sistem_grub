@@ -3,9 +3,6 @@ export class GrubResponse {
   grub_id: string;
   name: string;
   total_users: number;
-  // user_id?: number;
-  // username?: string;
-  // role?: string;
   users?: UserResponse[];
 }
 

@@ -46,12 +46,6 @@ export class GrubService {
         },
       });
 
-      // const totalUser = await this.prismaService.grub.count({
-      //   where: {
-      //     id: grub.id,
-      //   },
-      // });
-
       return {
         id: grub.id,
         grub_id: grub.grub_id,
@@ -76,7 +70,7 @@ export class GrubService {
 
     const grub = await this.prismaService.grub.findFirst({
       where: {
-        grub_id: joinRequest.grub_id,
+        grub_id: request.grub_id,
       },
     });
 
@@ -87,6 +81,7 @@ export class GrubService {
     const users = await this.prismaService.grubMember.findFirst({
       where: {
         user_id: user.id,
+        grub_id: request.grub_id,
       },
     });
 
@@ -180,17 +175,25 @@ export class GrubService {
       total_users: result.length,
       users: users,
     };
+  }
 
-    // return result.map((grubMember) => {
-    //   return {
-    //     id: grubMember.grub.id,
-    //     grub_id: grubMember.grub.grub_id,
-    //     name: grubMember.grub.name,
-    //     total_users: grubMember.grub.total_users,
-    //     user_id: grubMember.user_id,
-    //     username: grubMember.user.username,
-    //     role: grubMember.role.name,
-    //   };
-    // });
+  async getGrubs(user: User): Promise<GrubResponse[]> {
+    const result = await this.prismaService.grubMember.findMany({
+      where: {
+        user_id: user.id,
+      },
+      include: {
+        grub: true,
+      },
+    });
+
+    return result.map((grubMember) => {
+      return {
+        id: grubMember.grub.id,
+        grub_id: grubMember.grub.grub_id,
+        name: grubMember.grub.name,
+        total_users: grubMember.grub.total_users,
+      };
+    });
   }
 }
