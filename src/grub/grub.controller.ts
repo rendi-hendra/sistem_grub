@@ -5,6 +5,7 @@ import {
   HttpCode,
   Param,
   Post,
+  UseGuards,
   // UseInterceptors,
 } from '@nestjs/common';
 import { GrubService } from './grub.service';
@@ -17,6 +18,7 @@ import {
 } from '../model/grub.model';
 import { User } from '@prisma/client';
 import { Auth } from '../common/auth.decorator';
+import { GrubGuard } from 'src/common/grub.guard';
 
 @Controller('/api/grubs')
 export class GrubController {
@@ -48,6 +50,7 @@ export class GrubController {
 
   @Get('/:grub_id/member')
   @HttpCode(200)
+  @UseGuards(GrubGuard)
   async getGrubMember(
     @Auth() user: User,
     @Param('grub_id') grubId: string,

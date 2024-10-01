@@ -196,4 +196,52 @@ export class GrubService {
       };
     });
   }
+
+  // async kickUser(
+  //   user: User,
+  //   userId: number,
+  //   grubId: string,
+  // ): Promise<GrubMemberResponse> {
+
+  //   const grub = await this.prismaService.grubMember.findFirst({
+  //     where: {
+  //       user_id: user.id,
+  //       grub_id: grubId,
+  //     }
+  //   })
+
+  //   if(!grub) {
+  //     throw new HttpException('Forbidden', 403);
+  //   }
+
+  //   const isUser = await this.prismaService.grubMember.findFirst({
+  //     where: {
+  //       user_id: userId,
+  //       grub_id: grubId,
+  //     },
+  //   });
+
+  //   if (!isUser) {
+  //     throw new HttpException('User not found', 404);
+  //   }
+
+  //   const result = await this.prismaService.grubMember.delete({
+  //     where: {
+  //       user_id: userId,
+  //       grub_id: grubId,
+  //     },
+  //     include: {
+  //       grub: true,
+  //       user: true,
+  //     },
+  //   });
+
+  //   return {
+  //     id: result.id,
+  //     user_id: result.user_id,
+  //     grub_id: result.grub_id,
+  //     name: result.grub.name,
+  //     total_users: result.grub.total_users,
+  //   };
+  // }
 }
