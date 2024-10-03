@@ -1,51 +1,27 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  HttpException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
+import { Socket } from 'socket.io';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class GrubGuard implements CanActivate {
   constructor(private prismaService: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = request.headers['authorization'] as string;
-    const grubId = request.params['grub_id'] as string;
-
+    const request = context.switchToWs().getClient<Socket>();
+    const token = request?.handshake?.headers?.authorization as string;
     if (token) {
       const user = await this.prismaService.user.findFirst({
         where: {
           token: token,
         },
       });
-
-      const grub = await this.prismaService.grub.findFirst({
-        where: {
-          grub_id: grubId,
-        },
-      });
-
-      if (!grub) {
-        throw new HttpException('Grub not found!', 404);
-      }
-
-      const isMember = await this.prismaService.grubMember.findFirst({
-        where: {
-          user_id: user.id,
-          grub_id: grubId,
-        },
-      });
-
-      if (isMember) {
+      if (user) {
         return true;
+      } else {
+        throw new WsException('Unauthorized');
       }
-
-      throw new ForbiddenException('Forbidden');
     }
-    throw new ForbiddenException('Forbidden');
+    throw new WsException('Unauthorized');
   }
 }
