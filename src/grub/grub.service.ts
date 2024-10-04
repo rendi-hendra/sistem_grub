@@ -57,6 +57,15 @@ export class GrubService {
     return result;
   }
 
+  async totalUsers(grubId: string): Promise<number> {
+    const totalUser = await this.prismaService.grubMember.count({
+      where: {
+        grub_id: grubId,
+      },
+    });
+    return totalUser;
+  }
+
   async join(
     user: User,
     request: JoinGrubRequest,
@@ -197,51 +206,48 @@ export class GrubService {
     });
   }
 
-  // async kickUser(
-  //   user: User,
-  //   userId: number,
-  //   grubId: string,
-  // ): Promise<GrubMemberResponse> {
+  async kickUser(
+    user: User,
+    grubId: string,
+    userId: number,
+  ): Promise<GrubMemberResponse> {
+    const grub = await this.prismaService.grubMember.findFirst({
+      where: {
+        user_id: user.id,
+        grub_id: grubId,
+      },
+    });
 
-  //   const grub = await this.prismaService.grubMember.findFirst({
-  //     where: {
-  //       user_id: user.id,
-  //       grub_id: grubId,
-  //     }
-  //   })
+    if (!grub) {
+      throw new HttpException('Grub not found', 404);
+    }
 
-  //   if(!grub) {
-  //     throw new HttpException('Forbidden', 403);
-  //   }
+    const member = await this.prismaService.grubMember.findFirst({
+      where: {
+        user_id: userId,
+        grub_id: grubId,
+      },
+    });
 
-  //   const isUser = await this.prismaService.grubMember.findFirst({
-  //     where: {
-  //       user_id: userId,
-  //       grub_id: grubId,
-  //     },
-  //   });
+    if (!member) {
+      throw new HttpException('User not found', 404);
+    }
 
-  //   if (!isUser) {
-  //     throw new HttpException('User not found', 404);
-  //   }
+    const result = await this.prismaService.grubMember.delete({
+      where: {
+        id: member.id,
+      },
+      include: {
+        grub: true,
+      },
+    });
 
-  //   const result = await this.prismaService.grubMember.delete({
-  //     where: {
-  //       user_id: userId,
-  //       grub_id: grubId,
-  //     },
-  //     include: {
-  //       grub: true,
-  //       user: true,
-  //     },
-  //   });
-
-  //   return {
-  //     id: result.id,
-  //     user_id: result.user_id,
-  //     grub_id: result.grub_id,
-  //     name: result.grub.name,
-  //     total_users: result.grub.total_users,
-  //   };
-  // }
+    return {
+      id: result.id,
+      user_id: result.user_id,
+      grub_id: result.grub_id,
+      name: result.grub.name,
+      total_users: await this.totalUsers(result.grub_id),
+    };
+  }
 }

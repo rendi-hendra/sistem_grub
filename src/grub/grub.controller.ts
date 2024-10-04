@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -18,7 +19,9 @@ import {
 } from '../model/grub.model';
 import { User } from '@prisma/client';
 import { Auth } from '../common/auth.decorator';
-import { GrubGuard } from 'src/common/grub.guard';
+// import { GrubGuard } from 'src/common/grub.guard';
+import { Roles } from 'src/common/role.decorator';
+import { RoleGuard } from 'src/common/role.guard';
 
 @Controller('/api/grubs')
 export class GrubController {
@@ -50,7 +53,7 @@ export class GrubController {
 
   @Get('/:grub_id/member')
   @HttpCode(200)
-  @UseGuards(GrubGuard)
+  // @UseGuards(GrubGuard)
   async getGrubMember(
     @Auth() user: User,
     @Param('grub_id') grubId: string,
@@ -68,6 +71,22 @@ export class GrubController {
     const result = await this.grubService.getGrubs(user);
     return {
       data: result,
+    };
+  }
+
+  @Delete('/:grub_id/kick/:user_id')
+  @HttpCode(200)
+  @UseGuards(RoleGuard)
+  @Roles(['admin'])
+  async kickUser(
+    @Auth() user: User,
+    @Param('grub_id') grubId: string,
+    @Param('user_id') userId: number,
+  ): Promise<WebResponse<boolean>> {
+    const id = Number(userId);
+    await this.grubService.kickUser(user, grubId, id);
+    return {
+      data: true,
     };
   }
 }
