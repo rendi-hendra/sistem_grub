@@ -10,9 +10,10 @@ import {
   GrubMemberResponse,
   GrubResponse,
   JoinGrubRequest,
+  UpdateGrubRequest,
   UpdateRoleRequest,
   UserResponse,
-} from 'src/model/grub.model';
+} from '../model/grub.model';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -284,6 +285,43 @@ export class GrubService {
       id: result.user.id,
       name: result.user.username,
       role: result.role.name,
+    };
+  }
+
+  async updateGrub(
+    user: User,
+    grubId: string,
+    request: UpdateGrubRequest,
+  ): Promise<GrubResponse> {
+    const updateRequest: UpdateGrubRequest = this.validationService.validate(
+      GrubValidation.UPDATE,
+      request,
+    );
+
+    const grub = await this.prismaService.grub.findFirst({
+      where: {
+        grub_id: grubId,
+      },
+    });
+
+    if (!grub) {
+      throw new HttpException('Grub not found', 404);
+    }
+
+    const result = await this.prismaService.grub.update({
+      where: {
+        id: grub.id,
+      },
+      data: {
+        name: updateRequest.name,
+      },
+    });
+
+    return {
+      id: result.id,
+      grub_id: result.grub_id,
+      name: result.name,
+      total_users: await this.totalUsers(grubId),
     };
   }
 

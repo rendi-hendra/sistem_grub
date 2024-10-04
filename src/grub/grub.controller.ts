@@ -17,7 +17,9 @@ import {
   GrubMemberResponse,
   GrubResponse,
   JoinGrubRequest,
+  UpdateGrubRequest,
   UpdateRoleRequest,
+  UserResponse,
 } from '../model/grub.model';
 import { User } from '@prisma/client';
 import { Auth } from '../common/auth.decorator';
@@ -84,8 +86,22 @@ export class GrubController {
     @Auth() user: User,
     @Param('grub_id') grubId: string,
     @Body() request: UpdateRoleRequest,
-  ) {
+  ): Promise<WebResponse<UserResponse>> {
     const result = await this.grubService.updateRole(user, grubId, request);
+    return {
+      data: result,
+    };
+  }
+
+  @Patch('/:grub_id')
+  @HttpCode(200)
+  @Roles(['admin'])
+  async updateGrub(
+    @Auth() user: User,
+    @Param('grub_id') grubId: string,
+    @Body() request: UpdateGrubRequest,
+  ): Promise<WebResponse<GrubResponse>> {
+    const result = await this.grubService.updateGrub(user, grubId, request);
     return {
       data: result,
     };
