@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
   UseGuards,
   // UseInterceptors,
@@ -16,6 +17,7 @@ import {
   GrubMemberResponse,
   GrubResponse,
   JoinGrubRequest,
+  UpdateRoleRequest,
 } from '../model/grub.model';
 import { User } from '@prisma/client';
 import { Auth } from '../common/auth.decorator';
@@ -23,6 +25,7 @@ import { Auth } from '../common/auth.decorator';
 import { Roles } from 'src/common/role.decorator';
 import { RoleGuard } from 'src/common/role.guard';
 
+@UseGuards(RoleGuard)
 @Controller('/api/grubs')
 export class GrubController {
   constructor(private grubService: GrubService) {}
@@ -74,9 +77,22 @@ export class GrubController {
     };
   }
 
+  @Patch('/:grub_id/role')
+  @HttpCode(200)
+  @Roles(['admin'])
+  async updateRole(
+    @Auth() user: User,
+    @Param('grub_id') grubId: string,
+    @Body() request: UpdateRoleRequest,
+  ) {
+    const result = await this.grubService.updateRole(user, grubId, request);
+    return {
+      data: result,
+    };
+  }
+
   @Delete('/:grub_id/kick/:user_id')
   @HttpCode(200)
-  @UseGuards(RoleGuard)
   @Roles(['admin'])
   async kickUser(
     @Auth() user: User,
@@ -85,6 +101,18 @@ export class GrubController {
   ): Promise<WebResponse<boolean>> {
     const id = Number(userId);
     await this.grubService.kickUser(user, grubId, id);
+    return {
+      data: true,
+    };
+  }
+
+  @Delete('/:grub_id')
+  @HttpCode(200)
+  async leave(
+    @Auth() user: User,
+    @Param('grub_id') grubId: string,
+  ): Promise<WebResponse<boolean>> {
+    await this.grubService.leave(user, grubId);
     return {
       data: true,
     };

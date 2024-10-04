@@ -31,3 +31,8 @@ export class JoinGrubRequest {
 export class UpdateGrubRequest {
   name?: string;
 }
+
+export class UpdateRoleRequest {
+  user_id: number;
+  role_id: number;
+}

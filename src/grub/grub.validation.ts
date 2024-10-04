@@ -10,4 +10,8 @@ export class GrubValidation {
   static readonly UPDATE: ZodType = z.object({
     name: z.string().min(1).max(100),
   });
+  static readonly ROLE: ZodType = z.object({
+    user_id: z.number().min(1),
+    role_id: z.number().min(1),
+  });
 }

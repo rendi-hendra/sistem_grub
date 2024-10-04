@@ -10,6 +10,8 @@ import {
   GrubMemberResponse,
   GrubResponse,
   JoinGrubRequest,
+  UpdateRoleRequest,
+  UserResponse,
 } from 'src/model/grub.model';
 import { User } from '@prisma/client';
 
@@ -204,6 +206,85 @@ export class GrubService {
         total_users: grubMember.grub.total_users,
       };
     });
+  }
+
+  async leave(user: User, grubId: string): Promise<GrubMemberResponse> {
+    const member = await this.prismaService.grubMember.findFirst({
+      where: {
+        user_id: user.id,
+        grub_id: grubId,
+      },
+    });
+
+    if (!member) {
+      throw new HttpException('Grub not found', 404);
+    }
+
+    const result = await this.prismaService.grubMember.delete({
+      where: {
+        id: member.id,
+      },
+      include: {
+        grub: true,
+      },
+    });
+
+    return {
+      id: result.id,
+      user_id: result.user_id,
+      grub_id: result.grub_id,
+      name: result.grub.name,
+      total_users: await this.totalUsers(result.grub_id),
+    };
+  }
+
+  async updateRole(
+    user: User,
+    grubId: string,
+    request: UpdateRoleRequest,
+  ): Promise<UserResponse> {
+    this.logger.debug(`Update grub ${JSON.stringify(request)}`);
+
+    const updateRequest: UpdateRoleRequest = this.validationService.validate(
+      GrubValidation.ROLE,
+      request,
+    );
+
+    const role = await this.prismaService.role.findFirst({
+      where: {
+        id: updateRequest.role_id,
+      },
+    });
+
+    if (!role) {
+      throw new HttpException('Role not found', 404);
+    }
+
+    const member = await this.prismaService.grubMember.findFirst({
+      where: {
+        user_id: updateRequest.user_id,
+        grub_id: grubId,
+      },
+    });
+
+    const result = await this.prismaService.grubMember.update({
+      where: {
+        id: member.id,
+      },
+      data: {
+        role_id: updateRequest.role_id,
+      },
+      include: {
+        user: true,
+        role: true,
+      },
+    });
+
+    return {
+      id: result.user.id,
+      name: result.user.username,
+      role: result.role.name,
+    };
   }
 
   async kickUser(
