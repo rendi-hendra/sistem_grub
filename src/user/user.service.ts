@@ -87,4 +87,31 @@ export class UserService {
       token: user.token,
     };
   }
+
+  async oauth(request: LoginUserRequest): Promise<UserResponse> {
+    request.token = uuid();
+    const user = await this.prismaService.user.create({
+      data: request,
+    });
+
+    return {
+      id: user.id,
+      userId: user.user_id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      token: user.token,
+    };
+  }
+
+  // async updateToken(user: User, token: string) {
+  //   await this.prismaService.user.update({
+  //     where: {
+  //       username: user.username,
+  //     },
+  //     data: {
+  //       token: token,
+  //     },
+  //   });
+  // }
 }

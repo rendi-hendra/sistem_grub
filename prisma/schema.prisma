@@ -16,9 +16,12 @@ datasource db {
 
 model User {
   id        Int          @id @default(autoincrement())
-  username  String       @db.VarChar(255) @unique
-  name      String       @db.VarChar(255)
-  password  String       @db.VarChar(255)
+  user_id   String?
+  username  String?       @db.VarChar(255) @unique
+  email     String?       @db.VarChar(255) @unique
+  name      String?       @db.VarChar(255)
+  image      String?       @db.VarChar(255)
+  password  String?       @db.VarChar(255)
   token     String?      @db.VarChar(255)
 
   grub_members GrubMember[]

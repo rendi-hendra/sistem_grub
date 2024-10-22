@@ -137,8 +137,6 @@ export class GrubService {
   }
 
   async getGrubMember(user: User, grubId: string): Promise<GrubResponse> {
-    // this.logger.debug(`Get grub ${JSON.stringify(request)}`);
-
     const grub = await this.prismaService.grub.findFirst({
       where: {
         grub_id: grubId,

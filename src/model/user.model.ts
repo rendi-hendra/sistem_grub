@@ -1,17 +1,24 @@
 export class UserResponse {
   id: number;
-  username: string;
-  name: string;
+  userId?: string;
+  username?: string;
+  email?: string;
+  image?: string;
+  name?: string;
   token?: string;
 }
 
 export class RegisterUserRequest {
-  username: string;
-  name: string;
-  password: string;
+  username?: string;
+  name?: string;
+  password?: string;
 }
 
 export class LoginUserRequest {
-  username: string;
-  password: string;
+  userId?: number;
+  email?: string;
+  image?: string;
+  username?: string;
+  password?: string;
+  token?: string;
 }
