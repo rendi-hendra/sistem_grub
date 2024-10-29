@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
+  Param,
   Post,
   // UseInterceptors,
 } from '@nestjs/common';
@@ -12,6 +14,8 @@ import {
   UserResponse,
 } from '../model/user.model';
 import { WebResponse } from '../model/web.model';
+import { Auth } from 'src/common/auth.decorator';
+import { User } from '@prisma/client';
 // import { TimeInterceptor } from 'src/common/time.interceptor';
 
 @Controller('/api/users')
@@ -47,6 +51,18 @@ export class UserController {
     @Body() request: LoginUserRequest,
   ): Promise<WebResponse<UserResponse>> {
     const result = await this.userService.oauth(request);
+    return {
+      data: result,
+    };
+  }
+
+  @Delete('/signout/:token')
+  @HttpCode(200)
+  async signOut(
+    @Auth() user: User,
+    @Param('token') token: string,
+  ): Promise<WebResponse<UserResponse>> {
+    const result = await this.userService.signOut(user, token);
     return {
       data: result,
     };

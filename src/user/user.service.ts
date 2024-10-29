@@ -11,6 +11,7 @@ import {
 import { UserValidation } from './user.validation';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -89,7 +90,6 @@ export class UserService {
   }
 
   async oauth(request: LoginUserRequest): Promise<UserResponse> {
-    request.token = uuid();
     const user = await this.prismaService.user.create({
       data: request,
     });
@@ -104,14 +104,28 @@ export class UserService {
     };
   }
 
-  // async updateToken(user: User, token: string) {
-  //   await this.prismaService.user.update({
-  //     where: {
-  //       username: user.username,
-  //     },
-  //     data: {
-  //       token: token,
-  //     },
-  //   });
-  // }
+  async signOut(user: User, token: string) {
+    const users = await this.prismaService.user.findFirst({
+      where: {
+        id: user.id,
+        token: token,
+      },
+    });
+
+    await this.prismaService.user.delete({
+      where: {
+        id: users.id,
+        token: token,
+      },
+    });
+
+    return {
+      id: user.id,
+      userId: user.user_id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      token: user.token,
+    };
+  }
 }
